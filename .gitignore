@@ -1,0 +1,10 @@
+node_modules
+.next
+.env
+*.local
+dist
+build
+.cache
+.turbo
+pocketbase/pb_data
+pocketbase/pb_migrations
