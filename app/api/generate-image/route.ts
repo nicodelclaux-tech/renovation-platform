@@ -1,61 +1,40 @@
-import PocketBase from 'pocketbase';
+import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
+import { supabase } from '@/lib/supabase';
 
-const pb = new PocketBase(process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://159.203.27.124:8090');
+const openai = new OpenAI({
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseURL: "https://openrouter.ai/api/v1",
+});
 
-export default async function handler(req: any, res: any) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+export async function POST(req: NextRequest) {
+    try {
+        const { room, promptContext } = await req.json();
 
-  const { roomId, userPrompt } = req.body;
-  
-  // Note: We move the orchestrator logic inside the API route for simplicity in the scaffold
-  try {
-     // 1. Get Context
-     const room = await pb.collection('rooms').getOne(roomId, { expand: 'project' });
-     const project = room.expand?.project;
-     
-     // 2. OpenRouter Header
-     const headers = {
-       'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-       'Content-Type': 'application/json',
-       'HTTP-Referer': 'https://renovation-ai.platform', 
-       'X-Title': 'Renovation AI'
-     };
+        // 1. Obtener Style Bible de Supabase para consistencia
+        const { data: styleBible } = await supabase.from('style_bible').select('*');
+        const styleContext = styleBible?.map(rule => `${rule.key}: ${rule.value}`).join(', ');
 
-     // 3. Assemble Prompt (The Architect)
-     const architectRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-       method: 'POST', headers,
-       body: JSON.stringify({
-         model: 'anthropic/claude-3-5-sonnet',
-         messages: [
-           { role: 'system', content: 'You are an Architectural Orchestrator. Create a highly detailed image generation prompt. Maintain architecture facts. Vibe: High-end editorial.' },
-           { role: 'user', content: `Style: ${JSON.stringify(project?.style_bible)}. Architecture: ${room.fixed_architecture}. Request: ${userPrompt}` }
-         ]
-       })
-     });
-     const architectData = await architectRes.json();
-     const masterPrompt = architectData.choices?.[0]?.message?.content;
+        const finalPrompt = `Photorealistic architectural render of ${room}. Style DNA: ${styleContext}. Detail: ${promptContext}`;
 
-     // 4. Generate Image (The Artist)
-     // Swapping to a highly capable model for architecture
-     const artistRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-       method: 'POST', headers,
-       body: JSON.stringify({
-         model: 'black-forest-labs/flux-pro', // Using Flux Pro for realism
-         prompt: masterPrompt
-       })
-     });
-     const visualData = await artistRes.json();
-     
-     // 5. Store result
-     const generation = await pb.collection('generations').create({
-       room: roomId,
-       prompt: masterPrompt,
-       model_used: 'flux-pro',
-       image_url: visualData.id || visualData.image_url // Simplified
-     });
+        // 2. Generar imagen (Simulado/Real vía OpenRouter)
+        const response = await openai.images.generate({
+            model: "openai/dall-e-3",
+            prompt: finalPrompt,
+            size: "1024x1024",
+            quality: "hd",
+            n: 1
+        });
 
-     return res.status(200).json(generation);
-  } catch (err: any) {
-     return res.status(500).json({ error: err.message });
-  }
+        const imageUrl = response.data[0].url;
+
+        // 3. Registrar en Supabase
+        await supabase.from('generations').insert([
+            { room, prompt: finalPrompt, image_url: imageUrl, status: 'completed' }
+        ]);
+
+        return NextResponse.json({ url: imageUrl });
+    } catch (error) {
+        return NextResponse.json({ error: 'Generation failed', details: error }, { status: 500 });
+    }
 }
