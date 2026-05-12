@@ -1,0 +1,22 @@
+[
+  {
+    "name": "projects",
+    "type": "base",
+    "schema": [
+      {"name": "name", "type": "text", "required": true},
+      {"name": "description", "type": "editor"}
+    ],
+    "listRule": "", "viewRule": "", "createRule": "", "updateRule": "", "deleteRule": null
+  },
+  {
+    "name": "generations",
+    "type": "base",
+    "schema": [
+      {"name": "project", "type": "relation", "options": {"collectionId": "PROJECT_ID_PLACEHOLDER", "maxSelect": 1}},
+      {"name": "prompt", "type": "text"},
+      {"name": "image_url", "type": "url"},
+      {"name": "metadata", "type": "json"}
+    ],
+    "listRule": "", "viewRule": "", "createRule": "", "updateRule": ""
+  }
+]
