@@ -1,5 +1,5 @@
 import DashboardShell from '@/components/layout/DashboardShell';
-import { RoomCanvas } from '@/components/room/RoomCanvas';
+import RoomCanvas from '@/components/room/RoomCanvas';
 
 export default function Home() {
   return (

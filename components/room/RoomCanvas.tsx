@@ -1,6 +1,6 @@
 import { GenerationCard } from "@/components/generation/GenerationCard";
 
-export function RoomCanvas({ roomId }: { roomId: string }) {
+export default function RoomCanvas({ roomId }: { roomId: string }) {
   return (
     <section className="h-screen overflow-y-auto p-8">
       <div className="mb-8 flex items-end justify-between">

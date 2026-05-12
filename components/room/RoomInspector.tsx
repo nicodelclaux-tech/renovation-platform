@@ -1,4 +1,4 @@
-export function RoomInspector({ roomId }: { roomId: string }) {
+export default function RoomInspector({ roomId }: { roomId: string }) {
   return (
     <aside className="h-screen overflow-y-auto border-l border-stone-300 bg-white p-6">
       <p className="text-xs uppercase tracking-[0.25em] text-stone-500">Inspector</p>

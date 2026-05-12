@@ -1,6 +1,6 @@
-import { DashboardShell } from "@/components/layout/DashboardShell";
-import { RoomCanvas } from "@/components/room/RoomCanvas";
-import { RoomInspector } from "@/components/room/RoomInspector";
+import DashboardShell from "@/components/layout/DashboardShell";
+import RoomCanvas from "@/components/room/RoomCanvas";
+import RoomInspector from "@/components/room/RoomInspector";
 
 export default function RoomPage({
   params
