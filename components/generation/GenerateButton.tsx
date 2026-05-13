@@ -16,9 +16,7 @@ export function GenerateButton({ roomId, projectId }: { roomId: string; projectI
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomId, projectId }),
       });
-      if (res.ok) {
-        router.refresh();
-      }
+      if (res.ok) router.refresh();
     } catch (err) {
       console.error('Generation failed:', err);
     } finally {
@@ -30,10 +28,10 @@ export function GenerateButton({ roomId, projectId }: { roomId: string; projectI
     <button
       onClick={handleGenerate}
       disabled={loading}
-      className="flex items-center gap-xs bg-accent text-neutral px-md py-xs rounded-md font-medium text-sm hover:brightness-110 transition-all disabled:opacity-50"
+      className="flex items-center gap-xs bg-accent text-white px-md py-1.5 rounded-md font-medium text-sm hover:bg-accent-hover transition-colors disabled:opacity-50"
     >
-      {loading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
-      {loading ? 'Generating...' : 'Generate Concept'}
+      {loading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+      {loading ? 'Generating...' : 'Generate'}
     </button>
   );
 }

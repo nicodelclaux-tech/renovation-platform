@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Room } from '@/lib/types/database';
 import { supabase } from '@/lib/supabase';
-import { Save } from 'lucide-react';
+import { Save, CheckCircle, Building2, Paintbrush, Sliders } from 'lucide-react';
 
 export default function RoomInspector({ room, projectId }: { room: Room; projectId: string }) {
   const [architecture, setArchitecture] = useState(room.fixed_architecture || '');
@@ -13,59 +13,62 @@ export default function RoomInspector({ room, projectId }: { room: Room; project
 
   const handleSave = async () => {
     setSaving(true);
-    await supabase
-      .from('rooms')
-      .update({ fixed_architecture: architecture, design_brief: brief })
-      .eq('id', room.id);
+    await supabase.from('rooms').update({ fixed_architecture: architecture, design_brief: brief }).eq('id', room.id);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
   return (
-    <aside className="h-full overflow-y-auto border-l border-border bg-secondary/20 p-md">
-      <div className="flex items-center justify-between mb-md">
-        <p className="text-[10px] font-mono uppercase tracking-widest text-text-dim">Room Inspector</p>
+    <aside className="h-full overflow-y-auto border-l border-border bg-surface p-md">
+      <div className="flex items-center justify-between mb-lg">
+        <p className="text-xs font-medium uppercase tracking-wider text-text-muted">Inspector</p>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-xs text-xs bg-accent/10 text-accent px-sm py-xs rounded-md hover:bg-accent/20 disabled:opacity-50"
+          className="flex items-center gap-xs text-xs font-medium text-accent hover:text-accent-hover disabled:opacity-50 transition-colors"
         >
-          <Save size={12} /> {saved ? 'Saved!' : saving ? '...' : 'Save'}
+          {saved ? <><CheckCircle size={13} /> Saved</> : <><Save size={13} /> {saving ? '...' : 'Save'}</>}
         </button>
       </div>
 
       <div className="space-y-lg">
         <div>
-          <h3 className="text-sm font-semibold text-neutral mb-xs">Fixed Architecture</h3>
-          <p className="text-text-dim text-xs mb-sm">Immutable structural facts: windows, doors, ceiling height, load-bearing walls.</p>
+          <div className="flex items-center gap-xs mb-sm">
+            <Building2 size={14} className="text-text-dim" />
+            <h3 className="text-sm font-semibold text-neutral">Fixed Architecture</h3>
+          </div>
+          <p className="text-text-muted text-xs mb-sm">Immutable structural facts.</p>
           <textarea
             value={architecture}
             onChange={(e) => setArchitecture(e.target.value)}
-            className="w-full h-32 bg-primary border border-border rounded-md p-sm text-sm text-neutral resize-none focus:outline-none focus:border-accent"
-            placeholder="Ceiling Height: 2.8m&#10;Windows: 2x North-facing sash&#10;Fireplace: Original Victorian marble"
+            className="w-full h-28 border border-border rounded-md p-sm text-sm text-neutral resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-surface placeholder:text-text-muted"
+            placeholder="Ceiling Height: 2.8m&#10;Windows: 2x North-facing sash&#10;Fireplace: Victorian marble"
           />
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold text-neutral mb-xs">Design Brief</h3>
-          <p className="text-text-dim text-xs mb-sm">Desired mood, materials, atmosphere, and references for this room.</p>
+          <div className="flex items-center gap-xs mb-sm">
+            <Paintbrush size={14} className="text-text-dim" />
+            <h3 className="text-sm font-semibold text-neutral">Design Brief</h3>
+          </div>
+          <p className="text-text-muted text-xs mb-sm">Mood, materials, and atmosphere.</p>
           <textarea
             value={brief}
             onChange={(e) => setBrief(e.target.value)}
-            className="w-full h-32 bg-primary border border-border rounded-md p-sm text-sm text-neutral resize-none focus:outline-none focus:border-accent"
-            placeholder="Warm minimalism, oak floors, linen curtains, brass fixtures. Reference: Finca Cortesin lobby."
+            className="w-full h-28 border border-border rounded-md p-sm text-sm text-neutral resize-none focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-surface placeholder:text-text-muted"
+            placeholder="Warm minimalism, oak floors, linen curtains..."
           />
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold text-neutral mb-xs">Quick Adjustments</h3>
+          <div className="flex items-center gap-xs mb-sm">
+            <Sliders size={14} className="text-text-dim" />
+            <h3 className="text-sm font-semibold text-neutral">Quick Adjustments</h3>
+          </div>
           <div className="grid grid-cols-2 gap-xs">
             {['Warmer', 'Cooler', 'More Classic', 'More Modern', 'Softer', 'Bolder'].map((adj) => (
-              <button
-                key={adj}
-                className="bg-primary border border-border rounded-md px-sm py-xs text-xs text-text-dim hover:text-neutral hover:border-accent/50 transition-all"
-              >
+              <button key={adj} className="border border-border rounded-md px-sm py-1.5 text-xs text-text-dim hover:text-neutral hover:bg-secondary hover:border-transparent transition-all">
                 {adj}
               </button>
             ))}
