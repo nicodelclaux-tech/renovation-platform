@@ -2,6 +2,7 @@ import { createServerClient } from '@/lib/supabase-server';
 import { notFound } from 'next/navigation';
 import RoomCanvas from '@/components/room/RoomCanvas';
 import RoomInspector from '@/components/room/RoomInspector';
+import DesignChat from '@/components/layout/DesignChat';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 
@@ -39,9 +40,10 @@ export default async function RoomPage({
           <ChevronLeft size={16} /> {project?.name || 'Project'} / {room.name}
         </Link>
       </div>
-      <div className="grid h-[calc(100vh-49px)] grid-cols-[1fr_360px]">
+      <div className="grid h-[calc(100vh-49px)] grid-cols-[1fr_360px_320px]">
         <RoomCanvas roomId={params.roomId} generations={generations || []} projectId={params.projectId} />
         <RoomInspector room={room} projectId={params.projectId} />
+        <DesignChat roomId={params.roomId} />
       </div>
     </div>
   );
