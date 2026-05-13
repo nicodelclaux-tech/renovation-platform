@@ -1,11 +1,10 @@
-export interface Project {
-  id: string;
-  user_id: string;
-  name: string;
-  style_bible: StyleBible;
-  created_at: string;
-  updated_at: string;
-}
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
 export interface StyleBible {
   project_style?: string;
@@ -15,43 +14,143 @@ export interface StyleBible {
   avoid?: string[];
 }
 
-export interface Room {
-  id: string;
-  project_id: string;
-  name: string;
-  floor?: string;
-  wing?: string;
-  fixed_architecture: string;
-  design_brief: string;
-  created_at: string;
-}
-
-export interface Generation {
-  id: string;
-  room_id: string;
-  prompt: string;
-  master_prompt?: string;
-  image_url?: string;
-  status: 'pending' | 'generating' | 'completed' | 'failed' | 'approved';
-  metadata: Record<string, any>;
-  created_at: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  room_id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  created_at: string;
-}
-
 export type Database = {
   public: {
     Tables: {
-      projects: { Row: Project; Insert: Omit<Project, 'id' | 'created_at' | 'updated_at'>; Update: Partial<Omit<Project, 'id'>> };
-      rooms: { Row: Room; Insert: Omit<Room, 'id' | 'created_at'>; Update: Partial<Omit<Room, 'id'>> };
-      generations: { Row: Generation; Insert: Omit<Generation, 'id' | 'created_at'>; Update: Partial<Omit<Generation, 'id'>> };
-      chat_messages: { Row: ChatMessage; Insert: Omit<ChatMessage, 'id' | 'created_at'>; Update: Partial<Omit<ChatMessage, 'id'>> };
+      projects: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          style_bible: StyleBible | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          style_bible?: StyleBible | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          style_bible?: StyleBible | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      rooms: {
+        Row: {
+          id: string;
+          project_id: string;
+          name: string;
+          floor: string | null;
+          wing: string | null;
+          fixed_architecture: string | null;
+          design_brief: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          name: string;
+          floor?: string | null;
+          wing?: string | null;
+          fixed_architecture?: string | null;
+          design_brief?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          name?: string;
+          floor?: string | null;
+          wing?: string | null;
+          fixed_architecture?: string | null;
+          design_brief?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      generations: {
+        Row: {
+          id: string;
+          room_id: string;
+          prompt: string;
+          master_prompt: string | null;
+          image_url: string | null;
+          status: 'pending' | 'generating' | 'completed' | 'failed' | 'approved';
+          metadata: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          prompt: string;
+          master_prompt?: string | null;
+          image_url?: string | null;
+          status?: 'pending' | 'generating' | 'completed' | 'failed' | 'approved';
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          room_id?: string;
+          prompt?: string;
+          master_prompt?: string | null;
+          image_url?: string | null;
+          status?: 'pending' | 'generating' | 'completed' | 'failed' | 'approved';
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      chat_messages: {
+        Row: {
+          id: string;
+          room_id: string;
+          role: 'user' | 'assistant' | 'system';
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          role: 'user' | 'assistant' | 'system';
+          content: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          room_id?: string;
+          role?: 'user' | 'assistant' | 'system';
+          content?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: {
+      [_ in never]: never;
+    };
+    Functions: {
+      [_ in never]: never;
+    };
+    Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
     };
   };
 };
+
+export type Project = Database['public']['Tables']['projects']['Row'];
+export type Room = Database['public']['Tables']['rooms']['Row'];
+export type Generation = Database['public']['Tables']['generations']['Row'];
+export type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
