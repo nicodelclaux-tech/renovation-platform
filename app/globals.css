@@ -1,10 +1,32 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0b0c0e;
+  --color-secondary: #16181d;
+  --color-accent: #8b5cf6;
+  --color-accent-muted: #4c1d95;
+  --color-neutral: #ffffff;
+  --color-text-dim: #94a3b8;
+  --color-border: #2d3139;
+
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 32px;
+  --spacing-xl: 64px;
+}
 
 :root {
-  --background: #f8f6f1;
-  --foreground: #211c18;
+  --background: #0b0c0e;
+  --foreground: #ffffff;
 }
 
 body {
