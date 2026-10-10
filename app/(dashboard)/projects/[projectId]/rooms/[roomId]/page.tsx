@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import RoomCanvas from '@/components/room/RoomCanvas';
 import RoomInspector from '@/components/room/RoomInspector';
 import DesignChat from '@/components/layout/DesignChat';
+import RoomAssets from '@/components/assets/RoomAssets';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 
@@ -36,8 +37,10 @@ export default async function RoomPage({
       </div>
       <div className="flex-1 grid grid-cols-[1fr_320px_300px] overflow-hidden">
         <RoomCanvas roomId={roomId} generations={generations || []} projectId={projectId} />
-        <RoomInspector room={room} projectId={projectId} />
-        <DesignChat roomId={roomId} />
+        <RoomInspector room={room} projectId={projectId}>
+          <RoomAssets roomId={roomId} />
+        </RoomInspector>
+        <DesignChat roomId={roomId} projectId={projectId} />
       </div>
     </div>
   );

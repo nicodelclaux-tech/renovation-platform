@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Room } from '@/lib/types/database';
 import { Save, CheckCircle, Building2, Paintbrush, Sliders, Loader2 } from 'lucide-react';
@@ -15,7 +15,15 @@ const ADJUSTMENTS: { label: string; instruction: string }[] = [
   { label: 'Bolder', instruction: 'Make the scheme bolder with more contrast' },
 ];
 
-export default function RoomInspector({ room, projectId }: { room: Room; projectId: string }) {
+export default function RoomInspector({
+  room,
+  projectId,
+  children,
+}: {
+  room: Room;
+  projectId: string;
+  children?: ReactNode;
+}) {
   const [architecture, setArchitecture] = useState(room.fixed_architecture || '');
   const [brief, setBrief] = useState(room.design_brief || '');
   const [saved, setSaved] = useState(false);
@@ -159,6 +167,8 @@ export default function RoomInspector({ room, projectId }: { room: Room; project
           {adjusting && <p className="text-text-muted text-xs mt-sm">Generating variation...</p>}
           {adjustError && <p role="alert" className="text-red-600 text-xs mt-sm">{adjustError}</p>}
         </div>
+
+        {children}
       </div>
     </aside>
   );
