@@ -172,7 +172,7 @@ export default function DesignChat({ roomId, projectId: projectIdProp }: { roomI
   };
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-surface border-l border-border">
+    <div className="flex flex-col h-[75vh] lg:h-full min-h-0 bg-surface border-t lg:border-t-0 lg:border-l border-border">
       <div className="h-12 px-md flex items-center gap-sm border-b border-border">
         <MessageCircle size={15} className="text-accent" />
         <span className="text-xs font-medium text-text-dim">Design Chat</span>

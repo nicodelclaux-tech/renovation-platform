@@ -63,7 +63,7 @@ export default function RoomCanvas({
   };
 
   return (
-    <section className="h-full overflow-y-auto p-lg bg-secondary">
+    <section className="lg:h-full lg:overflow-y-auto p-md sm:p-lg bg-secondary">
       <div className="flex items-end justify-between mb-lg">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-text-muted">Generation Canvas</p>

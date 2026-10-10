@@ -35,7 +35,7 @@ export default async function RoomPage({
           <span className="text-neutral font-medium">{room.name}</span>
         </Link>
       </div>
-      <div className="flex-1 grid grid-cols-[1fr_320px_300px] overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden lg:grid lg:grid-cols-[1fr_320px_300px]">
         <RoomCanvas roomId={roomId} generations={generations || []} projectId={projectId} />
         <RoomInspector room={room} projectId={projectId}>
           <RoomAssets roomId={roomId} />

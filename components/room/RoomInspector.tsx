@@ -93,7 +93,7 @@ export default function RoomInspector({
   };
 
   return (
-    <aside className="h-full overflow-y-auto border-l border-border bg-surface p-md">
+    <aside className="lg:h-full lg:overflow-y-auto border-t lg:border-t-0 lg:border-l border-border bg-surface p-md">
       <div className="flex items-center justify-between mb-lg">
         <p className="text-xs font-medium uppercase tracking-wider text-text-muted">Inspector</p>
         <button

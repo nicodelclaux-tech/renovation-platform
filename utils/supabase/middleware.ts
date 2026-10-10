@@ -3,9 +3,24 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Database } from '@/lib/types/database';
 import { safeRedirectPath } from './redirect';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const NOT_CONFIGURED_MESSAGE =
+  'Supabase is not configured for this deployment. Set NEXT_PUBLIC_SUPABASE_URL and ' +
+  'NEXT_PUBLIC_SUPABASE_ANON_KEY (or NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) for this environment and redeploy.';
+
+// Without the env vars every request would crash with a bare 500; explain instead.
+const notConfiguredResponse = (pathname: string) =>
+  isApiRoute(pathname)
+    ? NextResponse.json({ error: NOT_CONFIGURED_MESSAGE }, { status: 503 })
+    : new NextResponse(
+        `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1">` +
+          `<title>Not configured</title><body style="font-family:system-ui,sans-serif;max-width:560px;margin:15vh auto;padding:0 16px;color:#37352f">` +
+          `<h1 style="font-size:20px">App not configured</h1><p style="line-height:1.5">${NOT_CONFIGURED_MESSAGE}</p></body>`,
+        { status: 503, headers: { 'content-type': 'text/html; charset=utf-8' } }
+      );
 
 const AUTH_ROUTES = ['/login', '/signup'];
 
@@ -15,6 +30,11 @@ const isAuthRoute = (pathname: string) =>
 const isApiRoute = (pathname: string) => pathname === '/api' || pathname.startsWith('/api/');
 
 export const updateSession = async (request: NextRequest) => {
+  if (!supabaseUrl || !supabaseKey) {
+    console.error(NOT_CONFIGURED_MESSAGE);
+    return notConfiguredResponse(request.nextUrl.pathname);
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
