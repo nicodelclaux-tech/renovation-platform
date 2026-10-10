@@ -1,17 +1,27 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { signIn } from '@/lib/auth';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn, safeRedirectPath } from '@/lib/auth';
 import Link from 'next/link';
 import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = safeRedirectPath(searchParams.get('next'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +29,8 @@ export default function LoginPage() {
     setError('');
     try {
       await signIn(email, password);
-      router.push('/projects');
+      router.replace(next);
+      router.refresh();
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {

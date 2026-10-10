@@ -1,4 +1,4 @@
-import { createServerClient } from '@/lib/supabase-server';
+import { createClient } from '@/utils/supabase/server';
 import { notFound } from 'next/navigation';
 import { StyleBibleEditor } from '@/components/project/StyleBibleEditor';
 import { RoomsList } from '@/components/project/RoomsList';
@@ -9,25 +9,26 @@ import { ChevronLeft } from 'lucide-react';
 export default async function ProjectDetailPage({
   params,
 }: {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 }) {
-  const supabase = createServerClient();
+  const { projectId } = await params;
+  const supabase = await createClient();
   const { data: project } = await supabase
     .from('projects')
     .select('*')
-    .eq('id', params.projectId)
-    .single();
+    .eq('id', projectId)
+    .maybeSingle();
 
   if (!project) notFound();
 
   const { data: rooms } = await supabase
     .from('rooms')
     .select('*')
-    .eq('project_id', params.projectId)
+    .eq('project_id', projectId)
     .order('created_at', { ascending: true });
 
   return (
-    <div className="min-h-screen bg-primary p-lg">
+    <div className="min-h-full bg-primary p-lg">
       <div className="max-w-6xl mx-auto">
         <Link href="/projects" className="flex items-center gap-xs text-text-dim text-sm hover:text-neutral mb-md">
           <ChevronLeft size={16} /> Back to Projects
@@ -45,15 +46,15 @@ export default async function ProjectDetailPage({
           <div className="lg:col-span-2 space-y-md">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-neutral">Rooms</h2>
-              <CreateRoomButton projectId={params.projectId} />
+              <CreateRoomButton projectId={projectId} />
             </div>
-            <RoomsList rooms={rooms || []} projectId={params.projectId} />
+            <RoomsList rooms={rooms || []} projectId={projectId} />
           </div>
 
           {/* Style Bible */}
           <div>
             <h2 className="text-lg font-semibold text-neutral mb-md">Style Bible</h2>
-            <StyleBibleEditor projectId={params.projectId} initialData={project.style_bible as any} />
+            <StyleBibleEditor projectId={projectId} initialData={project.style_bible as any} />
           </div>
         </div>
       </div>

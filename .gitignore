@@ -8,3 +8,7 @@ build
 .turbo
 pocketbase/pb_data
 pocketbase/pb_migrations
+
+# TypeScript incremental build info
+tsconfig.tsbuildinfo
+*.tsbuildinfo
