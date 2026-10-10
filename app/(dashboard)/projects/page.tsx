@@ -1,17 +1,17 @@
-import { createServerClient } from '@/lib/supabase-server';
+import { createClient } from '@/utils/supabase/server';
 import { ProjectCard } from '@/components/project/ProjectCard';
 import { CreateProjectButton } from '@/components/project/CreateProjectButton';
 import { FolderOpen } from 'lucide-react';
 
 export default async function ProjectsPage() {
-  const supabase = createServerClient();
+  const supabase = await createClient();
   const { data: projects } = await supabase
     .from('projects')
     .select('*')
     .order('updated_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-primary p-xl">
+    <div className="min-h-full bg-primary p-xl">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-lg">
           <div>

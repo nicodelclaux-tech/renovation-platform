@@ -1,8 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import { Database } from './types/database';
+import { createClient } from '@/utils/supabase/client';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabasePublishableKey =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-export const supabase = createClient<Database>(supabaseUrl, supabasePublishableKey);
+// Browser Supabase client. Uses @supabase/ssr so the auth session is stored in
+// cookies, which lets the proxy and server components see the signed-in user.
+export const supabase = createClient();

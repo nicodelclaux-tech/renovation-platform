@@ -2,7 +2,7 @@ import { CardSkeleton } from '@/components/ui/Skeleton';
 
 export default function ProjectsLoading() {
   return (
-    <div className="min-h-screen bg-primary p-lg">
+    <div className="min-h-full bg-primary p-lg">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-lg">
           <div className="space-y-xs">

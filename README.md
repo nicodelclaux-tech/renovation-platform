@@ -17,17 +17,37 @@ cp .env.example .env.local
 npm run dev
 ```
 
+## Environment variables
+
+Copy `.env.example` to `.env.local` and fill in:
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | one of these two | Supabase publishable key (preferred) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | one of these two | Legacy Supabase anon key (fallback) |
+| `SUPABASE_SERVICE_ROLE_KEY` | optional | Server-only key for `createAdminClient` in `lib/supabase-server.ts` (bypasses RLS; never expose to the client) |
+| `OPENAI_API_KEY` | yes | Image generation (`app/api/generate-image`) |
+| `OPENROUTER_API_KEY` | yes | LLM calls via OpenRouter (`app/api/chat-designer`, `app/api/generate-image`) |
+
 ## Key folders
 
 ```text
-/app                      Next.js App Router pages and API routes
-/components               UI and feature components
+/app/(auth)               Login and signup pages
+/app/(dashboard)          Authenticated pages (projects, rooms) wrapped in DashboardShell
+/app/api/*                Route handlers (generate-image, chat-designer)
+/proxy.ts                 Session refresh + route protection (Next 16 proxy, formerly middleware)
+/lib                      Supabase clients, auth helpers, database types (lib/types)
+/utils/supabase           @supabase/ssr helpers: browser client, server client, proxy session
+/components/layout        Dashboard shell, sidebar, design chat
+/components/project       Project and room management UI
+/components/room          Room canvas and inspector
+/components/generation    Generation cards, comparison view
+/components/ui            Shared primitives (Skeleton, ErrorBoundary, AnimatedPage)
 /modules                  Business logic by domain
-/services/openai          OpenAI image generation/editing services
-/services/supabase        Supabase client/server utilities
 /prompts                  Prompt templates and prompt assembly logic
-/db/migrations            Supabase SQL schema
-/types                    Shared TypeScript types
+/supabase/schema.sql      Full Supabase schema with RLS policies
+/db/migrations            SQL migrations
 /docs                     Product and engineering documentation
 ```
 
