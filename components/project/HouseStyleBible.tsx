@@ -11,9 +11,11 @@ interface StyleBibleProps {
     mood: string[];
     avoid: string[];
   };
+  /** Optional handler for the "Edit Bible" action; the button is hidden when omitted. */
+  onEdit?: () => void;
 }
 
-export const HouseStyleBible = ({ data }: StyleBibleProps) => {
+export const HouseStyleBible = ({ data, onEdit }: StyleBibleProps) => {
   const bible = data || {
     project_style: "Timeless London Townhouse",
     inspirations: ["Finca Cortesin", "Casa Tua", "Soho House"],
@@ -77,7 +79,9 @@ export const HouseStyleBible = ({ data }: StyleBibleProps) => {
       
       <div className="mt-lg pt-sm border-t border-border/50 flex justify-between items-center text-[10px] text-text-dim font-mono">
         <span className="flex items-center gap-xs"><ShieldCheck size={10} /> Persistent Design Memory Active</span>
-        <button className="text-accent hover:underline cursor-pointer">Edit Bible</button>
+        {onEdit && (
+          <button type="button" onClick={onEdit} className="text-accent hover:underline cursor-pointer">Edit Bible</button>
+        )}
       </div>
     </div>
   );
