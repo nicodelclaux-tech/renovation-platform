@@ -14,6 +14,8 @@ export interface StyleBible {
   avoid?: string[];
 }
 
+export type RoomAssetKind = 'photo' | 'floor_plan' | 'reference' | 'other';
+
 export type Database = {
   public: {
     Tables: {
@@ -134,6 +136,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      room_assets: {
+        Row: {
+          id: string;
+          room_id: string;
+          kind: RoomAssetKind;
+          storage_path: string;
+          file_name: string | null;
+          mime_type: string | null;
+          size_bytes: number | null;
+          notes: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_id: string;
+          kind?: RoomAssetKind;
+          storage_path: string;
+          file_name?: string | null;
+          mime_type?: string | null;
+          size_bytes?: number | null;
+          notes?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          room_id?: string;
+          kind?: RoomAssetKind;
+          storage_path?: string;
+          file_name?: string | null;
+          mime_type?: string | null;
+          size_bytes?: number | null;
+          notes?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -154,3 +192,4 @@ export type Project = Database['public']['Tables']['projects']['Row'];
 export type Room = Database['public']['Tables']['rooms']['Row'];
 export type Generation = Database['public']['Tables']['generations']['Row'];
 export type ChatMessage = Database['public']['Tables']['chat_messages']['Row'];
+export type RoomAsset = Database['public']['Tables']['room_assets']['Row'];
