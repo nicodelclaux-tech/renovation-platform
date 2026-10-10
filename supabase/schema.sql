@@ -99,3 +99,8 @@ drop policy if exists "Users delete own assets" on storage.objects;
 create policy "Users delete own assets" on storage.objects
   for delete to authenticated
   using (bucket_id = 'assets' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- One approved generation per room (see db/migrations/003_single_approved_generation.sql)
+CREATE UNIQUE INDEX IF NOT EXISTS generations_one_approved_per_room
+  ON generations (room_id)
+  WHERE status = 'approved';

@@ -56,6 +56,9 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
       .eq('id', generation.id)
       .select()
       .single();
+    if (error?.code === '23505') {
+      return NextResponse.json({ error: 'Another generation in this room was just approved' }, { status: 409 });
+    }
     if (!updated) return NextResponse.json({ error: error?.message || 'Failed to approve' }, { status: 500 });
     return NextResponse.json({ generation: updated });
   }
