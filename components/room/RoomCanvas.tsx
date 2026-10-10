@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Generation } from '@/lib/types/database';
 import { GenerationCard } from '@/components/generation/GenerationCard';
 import { GenerateButton } from '@/components/generation/GenerateButton';
 import { ComparisonView } from '@/components/generation/ComparisonView';
-import { ImageIcon, Columns } from 'lucide-react';
+import { ImageIcon, Columns, Pin } from 'lucide-react';
+
+const isComparable = (g: Generation) => !!g.image_url && (g.status === 'completed' || g.status === 'approved');
 
 export default function RoomCanvas({
   roomId,
@@ -20,10 +22,43 @@ export default function RoomCanvas({
   const [selected, setSelected] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
 
-  const handleSelect = (id: string) => {
-    if (!compareMode) return;
+  // Newest first; the approved direction is pinned separately at the top.
+  const { approved, history, comparable } = useMemo(() => {
+    const sorted = [...generations].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    const approvedGen = sorted.find((g) => g.status === 'approved') ?? null;
+    return {
+      approved: approvedGen,
+      history: sorted.filter((g) => g.id !== approvedGen?.id),
+      comparable: sorted.filter(isComparable),
+    };
+  }, [generations]);
+
+  const handleSelect = (gen: Generation) => {
+    if (!compareMode || !isComparable(gen)) return;
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 2 ? [prev[1], id] : [...prev, id]
+      prev.includes(gen.id) ? prev.filter((x) => x !== gen.id) : prev.length >= 2 ? [prev[1], gen.id] : [...prev, gen.id]
+    );
+  };
+
+  const toggleCompare = () => {
+    setCompareMode((v) => !v);
+    setSelected([]);
+  };
+
+  const renderCard = (gen: Generation) => {
+    const selectable = compareMode && isComparable(gen);
+    return (
+      <div
+        key={gen.id}
+        onClick={() => handleSelect(gen)}
+        className={`rounded-lg ${selectable ? 'cursor-pointer' : ''} ${
+          compareMode && !selectable ? 'opacity-50' : ''
+        } ${selected.includes(gen.id) ? 'ring-2 ring-accent' : ''}`}
+      >
+        <GenerationCard generation={gen} roomId={roomId} projectId={projectId} />
+      </div>
     );
   };
 
@@ -36,10 +71,10 @@ export default function RoomCanvas({
             {generations.length} concept{generations.length !== 1 ? 's' : ''}
           </h2>
         </div>
-        <div className="flex items-center gap-sm">
-          {generations.length >= 2 && (
+        <div className="flex items-start gap-sm">
+          {comparable.length >= 2 && (
             <button
-              onClick={() => { setCompareMode(!compareMode); setSelected([]); }}
+              onClick={toggleCompare}
               className={`flex items-center gap-xs px-sm py-1.5 rounded-md text-xs font-medium transition-all ${
                 compareMode ? 'bg-accent text-white' : 'border border-border text-text-dim hover:text-neutral hover:bg-secondary'
               }`}
@@ -51,25 +86,36 @@ export default function RoomCanvas({
         </div>
       </div>
 
-      {compareMode && selected.length > 0 && (
-        <div className="mb-md p-sm bg-accent/5 border border-accent/20 rounded-md text-xs text-accent font-medium">
-          {selected.length}/2 selected
-          {selected.length === 2 && (
-            <button onClick={() => setShowComparison(true)} className="ml-sm underline">View comparison</button>
-          )}
+      {compareMode && (
+        <div className="mb-md p-sm bg-accent/5 border border-accent/20 rounded-md text-xs text-accent font-medium flex items-center gap-sm">
+          {selected.length === 0 && 'Select two completed concepts to compare'}
+          {selected.length > 0 && `${selected.length}/2 selected`}
+          <button onClick={() => setShowComparison(true)} className="underline">
+            {selected.length === 2 ? 'View comparison' : 'Open comparison'}
+          </button>
         </div>
       )}
 
       {generations.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-          {generations.map((gen) => (
-            <div key={gen.id} onClick={() => handleSelect(gen.id)} className={`${
-              compareMode ? 'cursor-pointer' : ''
-            } ${selected.includes(gen.id) ? 'ring-2 ring-accent rounded-lg' : ''}`}>
-              <GenerationCard generation={gen} />
+        <>
+          {approved && (
+            <div className="mb-lg">
+              <p className="mb-sm flex items-center gap-xs text-xs font-medium uppercase tracking-wider text-accent">
+                <Pin size={12} /> Approved direction
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">{renderCard(approved)}</div>
             </div>
-          ))}
-        </div>
+          )}
+
+          {history.length > 0 && (
+            <>
+              {approved && (
+                <p className="mb-sm text-xs font-medium uppercase tracking-wider text-text-muted">History</p>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">{history.map(renderCard)}</div>
+            </>
+          )}
+        </>
       ) : (
         <div className="flex flex-col items-center justify-center h-[50vh] text-center">
           <div className="w-16 h-16 rounded-full bg-secondary border border-border flex items-center justify-center mb-md">
@@ -80,10 +126,11 @@ export default function RoomCanvas({
         </div>
       )}
 
-      {showComparison && selected.length === 2 && (
+      {showComparison && comparable.length >= 2 && (
         <ComparisonView
-          generationA={generations.find((g) => g.id === selected[0])!}
-          generationB={generations.find((g) => g.id === selected[1])!}
+          generations={comparable}
+          initialAId={selected[0]}
+          initialBId={selected[1]}
           onClose={() => setShowComparison(false)}
         />
       )}
