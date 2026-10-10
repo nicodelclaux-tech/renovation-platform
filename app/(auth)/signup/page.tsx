@@ -11,15 +11,23 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setNotice('');
     try {
-      await signUp(email, password);
-      router.push('/projects');
+      const { session } = await signUp(email, password);
+      if (!session) {
+        // Email confirmation is enabled: no session until the user confirms.
+        setNotice('Check your email to confirm your account, then sign in.');
+        return;
+      }
+      router.replace('/projects');
+      router.refresh();
     } catch (err: any) {
       setError(err.message || 'Signup failed');
     } finally {
@@ -39,6 +47,7 @@ export default function SignupPage() {
 
           <form onSubmit={handleSubmit} className="space-y-md">
             {error && <p className="text-red-600 text-sm text-center bg-red-50 p-sm rounded-md">{error}</p>}
+            {notice && <p className="text-accent text-sm text-center bg-accent/8 p-sm rounded-md">{notice}</p>}
             <div>
               <label className="text-xs font-medium text-text-dim">Email</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="mt-1 w-full border border-border rounded-md px-sm py-2 text-neutral text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-surface" required />
